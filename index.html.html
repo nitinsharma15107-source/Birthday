@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy Birthday Sinu ❤️</title>
+<!--
+  Single file birthday card for "Sinu / Sinny / Khushi".
+  INSTRUCTIONS:
+  - Put your photos in ./images/ named photo1.jpg, photo2.jpg, photo3.jpg, ...
+  - Put a teddy image as ./images/teddy.png (or change the filename below).
+  - Put background music file as ./music.mp3 (or change filename below).
+  - Open this file in a modern browser (Chrome/Edge/Firefox). No server required.
+-->
+<style>
+  :root{
+    --pink:#ff2d6f;
+    --light:#fff0f6;
+    --accent:#ff6fa3;
+    --deep:#c70058;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Poppins',sans-serif;background:linear-gradient(180deg,#fff0f6 0%, #ffe6f2 60%);overflow:hidden;color:var(--deep)}
+  /* container screens */
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px;box-sizing:border-box}
+  #start-screen{gap:18px}
+  h1.title{font-size:28px;margin:0;color:var(--deep)}
+  .start-btn{
+    background:linear-gradient(90deg,var(--pink),var(--accent));
+    color:white;border:none;padding:14px 26px;border-radius:40px;font-size:18px;cursor:pointer;box-shadow:0 10px 25px rgba(255,45,111,0.25);
+    transform-origin:center;animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+
+  /* countdown */
+  #countdown-screen{display:none}
+  .counter{font-size:120px;font-weight:800;color:var(--pink);text-shadow:0 6px 20px rgba(199,0,88,0.18)}
+  .subtext{font-size:18px;color:#b30059;margin-top:8px}
+
+  /* birthday screen */
+  #birthday-screen{display:none;overflow:hidden}
+  .wish {
+    font-size:36px;margin:8px 0;font-weight:800;
+    text-shadow:0 6px 18px rgba(255,0,108,0.12);
+  }
+  .subtitle{font-size:18px;margin:0 0 18px 0;color:#8f0044}
+
+  /* slideshow */
+  .slideshow {
+    width:320px;height:220px;border-radius:18px;overflow:hidden;border:6px solid rgba(255,255,255,0.45);
+    box-shadow:0 10px 30px rgba(199,0,88,0.12);background:#fff;position:relative;
+  }
+  .slideshow img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;left:0;top:0;opacity:0;transform:scale(1.05);transition:all 0.9s ease}
+  .slideshow img.show{opacity:1;transform:scale(1)}
+
+  /* teddy */
+  .teddy { width:140px;margin-top:18px;transform-origin:center; animation:pop 0.7s ease-out; }
+  @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+
+  /* letter modal */
+  .letter {
+    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.9);
+    width:min(760px,94%);max-width:760px;background:linear-gradient(180deg,#fff,#fff7fb);
+    padding:28px;border-radius:18px;box-shadow:0 30px 80px rgba(199,0,88,0.18);display:none;z-index:40;
+    border:4px solid rgba(255,111,150,0.08)
+  }
+  .letter h2{margin:0 0 8px 0;color:var(--pink)}
+  .letter p{white-space:pre-wrap;font-size:16px;color:#5b0036;line-height:1.45}
+  .close-letter {margin-top:12px;padding:10px 16px;border-radius:12px;border:none;background:var(--pink);color:white;cursor:pointer}
+
+  /* final reveal */
+  .final-screen{display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;z-index:60}
+  .final-screen h1{font-size:44px;color:white;text-shadow:0 10px 40px rgba(0,0,0,0.4)}
+  .final-sub{font-size:20px;color:rgba(255,255,255,0.9);margin-top:6px}
+
+  /* hearts */
+  .heart {
+    position:absolute;width:30px;height:30px;background:transparent;left:50%;top:50%;transform:translate(-50%,-50%);
+    z-index:20;pointer-events:none;
+  }
+  .heart:before,.heart:after {
+    content:"";position:absolute;width:15px;height:24px;background:var(--pink);border-radius:12px 12px 0 0;transform:rotate(-45deg);top:0;left:7.5px;
+  }
+  .heart:after{transform:rotate(45deg);left:0}
+  /* floating hearts container */
+  .hearts-container{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:10}
+
+  /* confetti pieces */
+  .confetti-piece{position:absolute;width:10px;height:16px;opacity:0.95;border-radius:2px;transform:translateY(-200px) rotate(0);}
+
+  /* music control */
+  .music-control{position:fixed;right:16px;top:16px;z-index:80;background:rgba(255,255,255,0.85);padding:8px 12px;border-radius:999px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 24px rgba(199,0,88,0.08)}
+  .music-control button{border:none;background:transparent;cursor:pointer;font-weight:700;color:var(--deep)}
+  .music-control input[type=range]{width:90px}
+
+  /* reveal love button */
+  .love-btn{margin-top:16px;padding:12px 22px;border-radius:999px;border:none;background:linear-gradient(90deg,#ff5f93,#ff2d6f);color:white;font-size:18px;cursor:pointer;box-shadow:0 12px 30px rgba(255,45,111,0.18)}
+
+  /* small screens */
+  @media (max-width:420px){
+    .counter{font-size:84px}
+    .wish{font-size:28px}
+    .slideshow{width:86vw;height:46vw}
+    .teddy{width:110px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Start Screen -->
+<div id="start-screen" class="screen">
+  <img src="" alt="" id="decor-heart" style="width:120px;display:block;margin-bottom:6px;">
+  <h1 class="title">A little surprise for My Sinu ❤️</h1>
+  <button class="start-btn" id="start-btn">Start Your Surprise</button>
+  <small style="color:#8f0044;margin-top:8px">Tap / Click to begin</small>
+</div>
+
+<!-- Countdown Screen -->
+<div id="countdown-screen" class="screen" style="display:none">
+  <div style="text-align:center">
+    <div class="counter" id="counter">3</div>
+    <div class="subtext">Counting down to your smile, Sinny ✨</div>
+  </div>
+</div>
+
+<!-- Birthday Screen -->
+<div id="birthday-screen" class="screen" style="display:none">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+    <div class="wish">Happy Birthday My Sinu ❤️</div>
+    <div class="subtitle">My Sinny • My Khushi • My Everything</div>
+
+    <!-- slideshow -->
+    <div class="slideshow" id="slideshow" aria-hidden="false">
+      <!-- images appended by JS -->
+    </div>
+
+    <!-- teddy -->
+    <img src="images/teddy.png" class="teddy" id="teddyImg" alt="Teddy for Sinu" />
+
+    <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+      <button class="love-btn" id="open-letter">Open My Letter</button>
+      <button class="love-btn" id="final-reveal-btn" style="background:linear-gradient(90deg,#ffc857,#ff6f3c)">Reveal Surprise</button>
+    </div>
+  </div>
+
+  <!-- confetti container -->
+  <div id="confetti-layer" style="position:absolute;inset:0;pointer-events:none;z-index:15"></div>
+
+  <!-- floating hearts -->
+  <div class="hearts-container" id="hearts"></div>
+</div>
+
+<!-- Letter Modal -->
+<div id="letter" class="letter" role="dialog" aria-modal="true" aria-labelledby="letter-title">
+  <h2 id="letter-title">To My Sinu (Sinny • Khushi) 💌</h2>
+  <p id="letter-text">
+Dear Sinu,
+
+Happy Birthday! Every day with you feels like a song I never want to stop listening to.
+Your smile, your laugh, the way you say my name — everything about you makes my world brighter.
+I promise to make more memories with you, hold your hand through storms and celebrate every tiny victory.
+
+I love you — today, tomorrow, always.
+Your (forever) — Khushi's lucky one ❤️
+
+
+  </p>
+  <div style="text-align:right">
+    <button class="close-letter" id="close-letter">Close</button>
+  </div>
+</div>
+
+<!-- Final full-screen reveal -->
+<div id="final-screen" class="final-screen" style="display:none;background:radial-gradient(circle at 50% 20%, rgba(255,111,150,0.18), rgba(0,0,0,0.5)), linear-gradient(180deg,#ff3b7a,#6a004a);">
+  <h1 id="final-title">Bhagwan ji kare hum kabhi bhi alag na ho and hmesha hi khush rhe ek dusre ke saath... !!! ❤️</h1>
+  <div class="final-sub"> A small Gift from your sir with a lots of love  to
+                             My Sinny • My Khushi • Forever • My Nakhro </div>
+</div>
+
+<!-- music controls -->
+<div class="music-control" id="music-control" style="display:none">
+  <button id="toggle-music">Play</button>
+  <input id="music-vol" type="range" min="0" max="1" step="0.01" value="0.6" />
+  <button id="mute">Mute</button>
+</div>
+
+<!-- audio element (file: music.mp3) -->
+<audio id="bg-music" loop preload="auto">
+  <source src="music.mp3" type="audio/mpeg" />
+  <!-- If this doesn't play, user should name their file music.mp3 or edit the source -->
+</audio>
+
+<script>
+/* =========================
+   CONFIG - change filenames if needed
+   ========================= */
+const PHOTOS = [
+  'images/photo1.jpg',
+  'images/photo2.jpg',
+  'images/photo3.jpg',
+  // add more like 'images/photo4.jpg' as needed
+];
+const TEDDY_SRC = 'images/teddy.png';
+const MUSIC_ID = 'bg-music';
+/* ========================= */
+
+document.addEventListener('DOMContentLoaded', ()=> {
+  const startBtn = document.getElementById('start-btn');
+  const startScreen = document.getElementById('start-screen');
+  const countdownScreen = document.getElementById('countdown-screen');
+  const birthdayScreen = document.getElementById('birthday-screen');
+  const counterEl = document.getElementById('counter');
+  const slideshow = document.getElementById('slideshow');
+  const confettiLayer = document.getElementById('confetti-layer');
+  const heartsLayer = document.getElementById('hearts');
+  const letter = document.getElementById('letter');
+  const openLetter = document.getElementById('open-letter');
+  const closeLetter = document.getElementById('close-letter');
+  const finalScreen = document.getElementById('final-screen');
+  const finalRevealBtn = document.getElementById('final-reveal-btn');
+  const bgMusic = document.getElementById(MUSIC_ID);
+  const musicControl = document.getElementById('music-control');
+  const toggleMusic = document.getElementById('toggle-music');
+  const vol = document.getElementById('music-vol');
+  const mute = document.getElementById('mute');
+  const teddyImg = document.getElementById('teddyImg');
+
+  // set teddy src
+  teddyImg.src = TEDDY_SRC;
+
+  // build slideshow images
+  PHOTOS.forEach((p, idx) => {
+    const img = document.createElement('img');
+    img.src = p;
+    img.alt = `Sinu photo ${idx+1}`;
+    if(idx===0) img.classList.add('show');
+    slideshow.appendChild(img);
+    // fallback handling: if image fails to load, hide it
+    img.onerror = ()=> img.style.display='none';
+  });
+
+  // slideshow rotation
+  let current = 0;
+  const slides = [...slideshow.querySelectorAll('img')];
+  function nextSlide(){
+    if(slides.length===0) return;
+    slides[current].classList.remove('show');
+    current = (current+1)%slides.length;
+    slides[current].classList.add('show');
+  }
+
+  // create subtle floating hearts continuously
+  function spawnHeart(){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    const startX = Math.random()*100;
+    h.style.left = startX + 'vw';
+    h.style.top = (90 + Math.random()*10) + 'vh';
+    const scale = 0.7 + Math.random()*0.8;
+    h.style.transform = `translate(-50%,-50%) scale(${scale})`;
+    heartsLayer.appendChild(h);
+    // animate upward
+    const travel = 30 + Math.random()*50;
+    const duration = 4000 + Math.random()*4000;
+    h.animate([
+      { transform: `translate(-50%,-50%) translateY(0) scale(${scale})`, opacity:1 },
+      { transform: `translate(-50%,-50%) translateY(-${travel}vh) scale(${scale*0.9})`, opacity:0.05 }
+    ], {duration, easing:'linear'}).onfinish = ()=> h.remove();
+  }
+  // spawn hearts every 600ms while birthday screen active
+  let heartsInterval;
+
+  // confetti generator
+  function launchConfetti(count=90){
+    const colors = ['#ff006a','#ff4d94','#ffd166','#ff7ab6','#ffe3ed','#ffd1dc'];
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = Math.random()*100 + 'vw';
+      el.style.top = -(10 + Math.random()*20) + 'vh';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.width = (6 + Math.random()*12) + 'px';
+      el.style.height = (8 + Math.random()*16) + 'px';
+      const rotate = Math.random()*360;
+      el.style.transform = `translateY(-200px) rotate(${rotate}deg)`;
+      confettiLayer.appendChild(el);
+
+      const fallDuration = 2200 + Math.random()*2200;
+      const sway = (Math.random()*80 - 40);
+      el.animate([
+        { transform: `translateY(-200px) rotate(${rotate}deg)`, opacity:1 },
+        { transform: `translateY(${110 + Math.random()*50}vh) translateX(${sway}px) rotate(${rotate+720}deg)`, opacity:1 }
+      ], {duration:fallDuration, easing:'cubic-bezier(.2,.8,.2,1)'})
+      .onfinish = ()=> el.remove();
+    }
+  }
+
+  // crackers (rapid confetti bursts)
+  function crackers(){
+    for(let i=0;i<8;i++){
+      setTimeout(()=> launchConfetti(18 + Math.floor(Math.random()*30)), i*200);
+    }
+  }
+
+  // start button click -> countdown
+  startBtn.addEventListener('click', ()=>{
+    startScreen.style.display='none';
+    countdownScreen.style.display='flex';
+    // start music UI visible and try to play (browser may require user gesture which startBtn provides)
+    musicControl.style.display = 'flex';
+    // start counter
+    let c = 3;
+    counterEl.textContent = c;
+    let countTimer = setInterval(()=>{
+      c--;
+      if(c>0) counterEl.textContent = c;
+      else {
+        clearInterval(countTimer);
+        counterEl.textContent = '0';
+        // transition to birthday screen
+        countdownScreen.style.display='none';
+        birthdayScreen.style.display='flex';
+        // start slideshow and hearts and confetti
+        setTimeout(()=>{ // small delay to let layout settle
+          // slideshow loop every 3s
+          setInterval(nextSlide,3000);
+          heartsInterval = setInterval(spawnHeart,650);
+          // gentle initial confetti and teddy pop
+          launchConfetti(40);
+        },600);
+        // autoplay music if possible
+        try { bgMusic.volume = vol.value; bgMusic.play(); toggleMusic.textContent='Pause'; } catch(e){}
+      }
+    },900);
+  });
+
+  // letter modal
+  openLetter.addEventListener('click', ()=> {
+    letter.style.display='block';
+    letter.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.96)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)'}],{duration:360,easing:'cubic-bezier(.2,.9,.2,1)'});
+  });
+  closeLetter.addEventListener('click', ()=> {
+    letter.animate([{opacity:1,transform:'translate(-50%,-50%) scale(1)'},{opacity:0,transform:'translate(-50%,-50%) scale(.96)'}],{duration:240}).onfinish = ()=> letter.style.display='none';
+  });
+
+  // final reveal button
+  finalRevealBtn.addEventListener('click', ()=>{
+    // stop hearts and show final screen
+    if(heartsInterval) clearInterval(heartsInterval);
+    birthdayScreen.style.display='none';
+    finalScreen.style.display='flex';
+    finalScreen.animate([{opacity:0},{opacity:1}],{duration:460});
+    // massive confetti + crackers + floating hearts in final screen
+    launchConfetti(140);
+    crackers();
+    // pulse final title and firework pops
+    const finalTitle = document.getElementById('final-title');
+    finalTitle.animate([{transform:'scale(.9)'},{transform:'scale(1.03)'},{transform:'scale(1)'}],{duration:1600,iterations:2,easing:'ease-in-out'});
+    // also play music louder
+    try{ bgMusic.volume = Math.min(1, Math.max(0.6, vol.value)); }catch(e){}
+    // small popping heart animations to final screen
+    let pops = 0;
+    const popInt = setInterval(()=> {
+      const h = document.createElement('div'); h.className='heart';
+      h.style.left = (30 + Math.random()*40) + 'vw';
+      h.style.top = (40 + Math.random()*30) + 'vh';
+      h.style.transform = `translate(-50%,-50%) scale(${1+Math.random()*0.6})`;
+      finalScreen.appendChild(h);
+      h.animate([{opacity:0, transform:'translate(-50%,-50%) scale(.6)'},{opacity:1, transform:'translate(-50%,-50%) scale(1.05)'},{opacity:0, transform:'translate(-50%,-50%) scale(.4)'}],{duration:1200}).onfinish=()=>h.remove();
+      pops++; if(pops>13) clearInterval(popInt);
+    },170);
+  });
+
+  // music controls
+  toggleMusic.addEventListener('click', ()=>{
+    if(bgMusic.paused){ bgMusic.play(); toggleMusic.textContent='Pause'} else { bgMusic.pause(); toggleMusic.textContent='Play' }
+  });
+  vol.addEventListener('input', ()=> bgMusic.volume = vol.value);
+  mute.addEventListener('click', ()=> { bgMusic.muted = !bgMusic.muted; mute.textContent = bgMusic.muted ? 'Unmute' : 'Mute'; });
+
+  // try automatic play (some browsers allow because click occurred)
+  // if audio fails, user can press play in music control
+  try{ bgMusic.volume = vol.value; }catch(e){}
+
+  // keyboard accessibility: press space to start when start screen focused
+  document.addEventListener('keydown',(e)=>{
+    if(e.key===' ' || e.key==='Enter'){
+      const visible = window.getComputedStyle(startScreen).display !== 'none';
+      if(visible){ startBtn.click(); e.preventDefault();}
+    }
+  });
+});
+</script>
+</body>
+</html>
